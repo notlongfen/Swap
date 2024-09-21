@@ -34,6 +34,8 @@ export function getProvider(): providers.Provider | null {
 }
 
 export function getWalletAddress(): string | null {
+  console.log(walletExtensionAddress);
+  console.log(wallet.address);
   return CurrentConfig.env === Environment.WALLET_EXTENSION
     ? walletExtensionAddress
     : wallet.address
@@ -89,19 +91,43 @@ function createBrowserExtensionProvider(): ethers.providers.Web3Provider | null 
 async function sendTransactionViaExtension(
   transaction: ethers.providers.TransactionRequest
 ): Promise<TransactionState> {
+  // try {
+  //   const receipt = await browserExtensionProvider?.send(
+  //     'eth_sendTransaction',
+  //     [transaction]
+  //   )
+  //   console.log(receipt)
+  //   if (receipt) {
+  //     return TransactionState.Sent
+  //   } else {
+  //     return TransactionState.Failed
+  //   }
+  // } catch (e) {
+  //   console.log(e)
+  //   return TransactionState.Rejected
+  // }
   try {
-    const receipt = await browserExtensionProvider?.send(
-      'eth_sendTransaction',
-      [transaction]
-    )
-    if (receipt) {
-      return TransactionState.Sent
-    } else {
+    const signer = browserExtensionProvider?.getSigner()
+    console.log(signer);
+    if (!signer) {
       return TransactionState.Failed
     }
-  } catch (e) {
-    console.log(e)
-    return TransactionState.Rejected
+    
+    // if (transaction.from) delete transaction.from;
+    // if (transaction.maxFeePerGas) delete transaction.maxFeePerGas;
+    // if (transaction.maxPriorityFeePerGas) delete transaction.maxPriorityFeePerGas;
+    // if (transaction.gasLimit) delete transaction.gasLimit;
+    
+    const txResponse = await signer.sendTransaction(transaction);
+    console.log(transaction);
+    const receipt = await txResponse.wait();
+    if(receipt) {
+      return TransactionState.Sent;
+    }
+    return TransactionState.Failed;
+  } catch (error) {
+    console.log(error);
+    return TransactionState.Failed;
   }
 }
 
@@ -138,4 +164,12 @@ async function sendTransactionViaWallet(
   } else {
     return TransactionState.Failed
   }
+}
+
+export async function disconnectWallet() {
+  const provider = getProvider()
+  if (provider) {
+    provider.removeAllListeners()
+  }
+  walletExtensionAddress = null
 }

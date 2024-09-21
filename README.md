@@ -18,6 +18,8 @@ To configure between these, set the `Environment` to the correct environment in 
 
 The configuration includes control of the environment as well as inputs to the example's functionality. The rest of the code should need no modification to function.
 
+
+
 ## Setup
 
 ### Install dependencies
@@ -42,7 +44,8 @@ This example uses the first sample wallet offered by Foundry (listed in the term
 
 1. Install a wallet browser extension
 2. Add a new manual/local network to your wallet local chain using `http://localhost:8545` for your RPC URL and `1337` for your chain ID, and `ETH` for your currency.
-3. Import your selected wallet using your private key (e.g. `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80` from Foundry's example wallets)
+3. Import your selected wallet using your private key (e.g. `0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80` from Foundry's example wallets)   
+4. Import the wallet for platform fee recipient using the private key shown in anvil terminal output. (optional)
 
 ### Start the web interface
 

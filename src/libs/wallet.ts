@@ -21,6 +21,7 @@ export async function getCurrencyBalance(
 ): Promise<string> {
   // Handle ETH directly
   if (currency.isNative) {
+    console.log(ethers.utils.formatEther(await provider.getBalance(address)));
     return ethers.utils.formatEther(await provider.getBalance(address))
   }
 
@@ -32,7 +33,8 @@ export async function getCurrencyBalance(
   )
   const balance: number = await walletContract.balanceOf(address)
   const decimals: number = await walletContract.decimals()
-
+  console.log(toReadableAmount(Number(await provider.getBalance(address)), decimals).toString());
+  console.log(toReadableAmount(balance, decimals).toString());
   // Format with proper units (approximate)
   return toReadableAmount(balance, decimals).toString()
 }
@@ -42,9 +44,10 @@ export async function wrapETH(eth: number) {
   const provider = getProvider()
   const address = getWalletAddress()
   if (!provider || !address) {
+    console.log(provider, " x ", address)
     throw new Error('Cannot wrap ETH without a provider and wallet address')
   }
-
+  console.log(provider, " i ", address)
   const wethContract = new ethers.Contract(
     WETH_CONTRACT_ADDRESS,
     WETH_ABI,
@@ -61,8 +64,9 @@ export async function wrapETH(eth: number) {
     maxFeePerGas: MAX_FEE_PER_GAS,
     maxPriorityFeePerGas: MAX_PRIORITY_FEE_PER_GAS,
   }
-
-  await sendTransaction(transaction)
+  console.log(transaction)
+  const result = await sendTransaction(transaction)
+  console.log(result)
 }
 
 // unwraps ETH (rounding up to the nearest ETH for decimal places)

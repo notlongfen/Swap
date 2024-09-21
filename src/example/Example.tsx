@@ -4,6 +4,7 @@ import { Environment, CurrentConfig } from '../config'
 import { getCurrencyBalance, wrapETH } from '../libs/wallet'
 import {
   connectBrowserExtensionWallet,
+  disconnectWallet,
   getProvider,
   getWalletAddress,
   TransactionState,
@@ -38,9 +39,12 @@ const Example = () => {
   const refreshBalances = useCallback(async () => {
     const provider = getProvider()
     const address = getWalletAddress()
+    console.log(address, " ", provider)
     if (!address || !provider) {
+      console.log("No address or provider")
       return
     }
+    console.log(await getCurrencyBalance(provider, address, CurrentConfig.tokens.in))
 
     setTokenInBalance(
       await getCurrencyBalance(provider, address, CurrentConfig.tokens.in)
@@ -61,6 +65,13 @@ const Example = () => {
   const onCreateRoute = useCallback(async () => {
     setRoute(await generateRoute())
   }, [])
+
+  const ondisconnectWallet = useCallback(() => {
+    setTokenInBalance(undefined)
+    setTokenOutBalance(undefined)
+    disconnectWallet();
+  }, [])
+
 
   const executeSwap = useCallback(async (route: SwapRoute | null) => {
     if (!route) {
@@ -86,6 +97,7 @@ const Example = () => {
         !getWalletAddress() && (
           <button onClick={onConnectWallet}>Connect Wallet</button>
         )}
+      <button onClick={ondisconnectWallet}>Signout</button>
       <h3>{`Block Number: ${blockNumber + 1}`}</h3>
       <h3>{`Transaction State: ${txState}`}</h3>
       <h3>{`Token In (${CurrentConfig.tokens.in.symbol}) Balance: ${tokenInBalance}`}</h3>
